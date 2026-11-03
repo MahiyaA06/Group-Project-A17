@@ -1,3 +1,3 @@
 import SwiftBot.SwiftBotAPI;
 
-public class connecting-bot;
+public class connecting-bot{
