@@ -27,4 +27,3 @@ public class ColourChanger {
         System.exit(0);
     }
 }
-
