@@ -1,6 +1,6 @@
 import swiftbot.*;
 public class SimonButtons {
-	private static final SwiftBotAPI bot = SwiftBotAPI.INSTANCE;
+	public static final SwiftBotAPI bot = SwiftBotAPI.INSTANCE;
 	
 	static int[][] colours = {{255, 0, 0}, {0, 0, 255}, {255, 255, 0}, {0, 255, 0}};
 	//0 =red, 1 =blue, 2 =yellow, 3 =green
