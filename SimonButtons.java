@@ -6,7 +6,7 @@ public class SimonButtons {
 	//0 =red, 1 =blue, 2 =yellow, 3 =green
 	
 	static int[] button_Assignments = {0,1,2,3};
-	public static void main(String[] args) {
+	public static void SimionButtons(String[] args) {
 		bot.enableButton(Button.A, () ->{
 		try {
 		bot.setUnderlight(
