@@ -1,4 +1,7 @@
 import swiftbot.*;
+import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -14,6 +17,8 @@ public class DoesMySwiftBotWork {
 	static final String GREEN = "\u001B[32m";
 	static final String WHITE = "\u001B[37m";
 	static final String BOLD = "\u001B[1m";
+	static int score = 0;
+	static int round = 0;
 
 	public static void main(String[] args) throws InterruptedException {
 		try {
@@ -61,25 +66,15 @@ public class DoesMySwiftBotWork {
 			case "1":
 				StartUp();
 				break;
-
-			// Testing Button lights
-			case "2":
-				SimonButtons();
-				break;
-
-			// Testing Ultrasound
-			case "3":
-				ShowScreen();
-				break;
-
+				
 			// Testing Left Wheel
 			case "4":
 				showContinue_QuitScreen();
 				break;
-				// Testing Right Wheel
+			// Testing Right Wheel
 
 			case "8":
-				testQRCodeDetection();
+				LoopsForRound();
 				break;
 
 			// EXIT
@@ -96,89 +91,34 @@ public class DoesMySwiftBotWork {
 	}
 
 	public static void StartUp() {
-        System.out.println("===============================");
-        System.out.println("       SIMON MEMORY GAME!      ");
-        System.out.println("===============================");
-        System.out.println("");
-        System.out.println("RULES OF THE GAME: ");
-        System.out.println("");
-        System.out.println("1) Repeat the order identically to the colours on the bot");
-        System.out.println("2) You only get 5 lives before GAME OVER");
-        System.out.println("3) You will get the choice to continue or leave the game");
-        System.out.println("");
-        System.out.println("===============================");
-    }
+		System.out.println("===============================");
+		System.out.println("       SIMON MEMORY GAME!      ");
+		System.out.println("===============================");
+		System.out.println("");
+		System.out.println("RULES OF THE GAME: ");
+		System.out.println("");
+		System.out.println("1) Repeat the order identically to the colours on the bot");
+		System.out.println("2) You only get 5 lives before GAME OVER");
+		System.out.println("3) You will get the choice to continue or leave the game");
+		System.out.println("");
+		System.out.println("===============================");
 
-	public static final SwiftBotAPI bot = SwiftBotAPI.INSTANCE;
+	}
 
 	static int[][] colours = { { 255, 0, 0 }, { 0, 0, 255 }, { 255, 255, 0 }, { 0, 255, 0 } };
 	// 0 =red, 1 =blue, 2 =yellow, 3 =green
 
 	static int[] button_Assignments = { 0, 1, 2, 3 };
 
-	public static void SimonButtons() {
-		bot.enableButton(Button.A, () -> {
-			try {
-				bot.setUnderlight(Underlight.FRONT_LEFT, colours[button_Assignments[0]]);
-				Thread.sleep(500);
-
-				bot.disableUnderlights();
-
-			} catch (InterruptedException e) {
-				System.out.println("Error flashing LED");
-			}
-		});
-
-		bot.enableButton(Button.B, () -> {
-			try {
-				bot.setUnderlight(Underlight.FRONT_RIGHT, colours[button_Assignments[1]]);
-				Thread.sleep(500);
-
-				bot.disableUnderlights();
-
-			} catch (InterruptedException e) {
-				System.out.println("Error flashing LED");
-			}
-		});
-
-		bot.enableButton(Button.X, () -> {
-			try {
-				bot.setUnderlight(Underlight.FRONT_LEFT, colours[button_Assignments[2]]);
-				Thread.sleep(500);
-
-				bot.disableUnderlights();
-
-			} catch (InterruptedException e) {
-				System.out.println("Error flashing LED");
-			}
-		});
-
-		bot.enableButton(Button.Y, () -> {
-			try {
-				bot.setUnderlight(Underlight.FRONT_LEFT, colours[button_Assignments[3]]);
-				Thread.sleep(500);
-
-				bot.disableUnderlights();
-
-			} catch (InterruptedException e) {
-				System.out.println("Error flashing LED");
-			}
-		});
-
-		while (true) {
-		}
-	}
-
 	public static boolean ShowScreen(int round) {
 		if (round % 5 == 0) {
-			ContinueQuitScreen.showContinue_QuitScreen();
+			showContinue_QuitScreen();
+			return true;
 		}
 
-		return true;
+		return false;
 
 	}
-
-	private static final SwiftBotAPI bot = SwiftBotAPI.INSTANCE;
 
 	public static void showContinue_QuitScreen() {
 
@@ -186,381 +126,141 @@ public class DoesMySwiftBotWork {
 		System.out.println("    CONTINUE OR QUIT GAME ?    ");
 		System.out.println("===============================");
 		System.out.println("                               ");
+		System.out.println("          1 = Continue         ");
+		System.out.println("          2 = Quit Game        ");
 		System.out.println("                               ");
-		System.out.println("          A = Continue         ");
-		System.out.println("          B = Quit Game        ");
 		System.out.println("===============================");
-		bot.enableButton(Button.A, () -> {
-
-			continueGame();
-
-		});
-
-		bot.enableButton(Button.B, () -> {
-
-			showGame_OverScreen();
-		});
-	}
-
-	public static void continueGame() {
-		System.out.println("Continuing game...");
-	}
-
-	public static void showGame_OverScreen() {
-		System.out.println("===============================");
-		System.out.println("Sorry You Lost, " + "See you again later.");
-		System.exit(0);
-	}
-
-	public static void testCamera() {
-		try {
-			/*
-			 * Taking 720x720 images for the test, however, it is recommended to use smaller
-			 * sizes for faster code execution
-			 */
-
-			BufferedImage bwImage = swiftBot.takeGrayscaleStill(ImageSize.SQUARE_720x720);
-			BufferedImage image = swiftBot.takeStill(ImageSize.SQUARE_720x720);
-
-			if (image == null || bwImage == null) {
-				System.out.println("ERROR: Image is null");
-				System.exit(5);
-			} else {
-				// Save the bwImage to a directory.
-				ImageIO.write(bwImage, "png", new File("/data/home/pi/bwImage.png"));
-				ImageIO.write(image, "png", new File("/data/home/pi/colourImage.png"));
-
-				System.out.println("SUCCESS: Camera tests succeeded");
-				Thread.sleep(1000);
-			}
-		} catch (Exception e) {
-			System.out.println("\nCamera not enabled!");
-			System.out.println("Try running the following command: ");
-			System.out.println("sudo raspi-config nonint do_camera 0\n");
-			System.out.println("Then reboot using the following command: ");
-			System.out.println("sudo reboot\n");
-			System.exit(5);
-		}
-	}
-
-	/*
-	 * Testing each light for the SwiftBot Buttons. Each button is first
-	 * individually turned on using the `testIndividualButtonLights()` method below
-	 * this method. then, all button lights are turned on with
-	 * `testAllButtonLights()`.
-	 */
-	public static void testButtonLights() {
-		try {
-			testIndividualButtonLights();
-			testAllButtonLights();
-		} catch (Exception e) {
-			System.out.println("ERROR: An error occurred testing button lights.");
-			e.printStackTrace();
+		
+		String ans = reader.nextLine();
+		
+		switch (ans) {
+	
+		case "8":
+			LoopsForRound();
+			break;
+	
+		case "0":
+			GameOver();
 			System.exit(0);
+			break;
+	
+		default:
+			System.out.println("ERROR: Please enter a valid number.");
+			break;
 		}
 	}
 
-	/*
-	 * This method tests the ultrasound
-	 * 
-	 * 
-	 * 
-	 */
+	static Random random = new Random();
+	static BlockingQueue<Integer> presses = new LinkedBlockingQueue<>();
 
-	public static void testUltrasound() {
-		double distanceToObject = 0.0;
-		System.out.println("Turning on Ultrasound...");
-		try {
-			distanceToObject = SwiftBotAPI.INSTANCE.useUltrasound();
-			System.out.println("Distance to object:" + distanceToObject);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	public static void LoopsForRound() throws InterruptedException {
 
-	/*
-	 * This method tests each individual button light, by firstly turning them on
-	 * with {@code setButtonLight();}, before toggling them off with {@code
-	 * toggleButtonLight();}. Afterwards, a for loop is ran that will turn up the
-	 * brightness of the individual button light from 0 to 100 with {@code
-	 * setButtonLightBrightness}, before turning it off completely with {@code
-	 * setButtonLight();}.
-	 */
-	public static void testIndividualButtonLights() {
-		try {
-			// Creating an array with all the robot buttons
-			Button buttons[] = { Button.A, Button.B, Button.X, Button.Y };
+		int lives = 3;
+		String sequence = "";
+		boolean addNewColour = true;
 
-			for (Button button : buttons) {
-				// Turning it on
-				swiftBot.setButtonLight(button, true);
 
-				// Wait a second
-				Thread.sleep(1000);
-
-				// Toggling the button light off.
-				swiftBot.toggleButtonLight(button);
-
-				// Small wait so they're completely off.
-				Thread.sleep(250);
-
-				// Completely turning off the button light.
-				swiftBot.setButtonLight(button, false);
-				System.out.println("SUCCESS: Changes for button " + button + " successful.");
-			}
-		} catch (Exception e) {
-			System.out.println("ERROR: An error occurred setting button lights.");
-			e.printStackTrace();
-			System.exit(5);
-		}
-	}
-
-	/*
-	 * This method test all the button lights at once by using the {@code
-	 * fillButtonLights();} method. After 2.5 seconds, all the button lights will be
-	 * turned off with {@code disableButtonLights();}.
-	 */
-	public static void testAllButtonLights() {
-		try {
-			// Turns on all button lights
-			swiftBot.fillButtonLights();
-
-			// Waiting for 2.5 seconds
-			Thread.sleep(2500);
-
-			// Turns off all button lights at once.
-			swiftBot.disableButtonLights();
-		} catch (Exception e) {
-			System.out.println("ERROR: An error occurred setting all button lights.");
-			e.printStackTrace();
-			System.exit(5);
-		}
-	}
-
-	/*
-	 * Tests the user-selected wheel, taking the wheel as a parameter: either "left"
-	 * or "right". If the "left" wheel is selected, the function sets the left wheel
-	 * velocity to 100% If the "right" wheel is selected, the function sets the
-	 * right wheel velocity to 100%
-	 */
-	public static void testWheel(String wheel) {
-		// These variables represent the % velocity of each wheel.
-		// They are updated later in the method, depending on the chosen wheel
-		int leftWheelVelocity = 0;
-		int rightWheelVelocity = 0;
-
-		// If left wheel is chosen, set left wheel velocity to 100
-		if (wheel.equals("left")) {
-			System.out.println("Testing the left wheel");
-			leftWheelVelocity = 100;
-		}
-		// Otherwise, set the right wheel velocity to 100.
-		else {
-			System.out.println("Testing the right wheel");
-			rightWheelVelocity = 100;
-		}
+		System.out.println("Welcome to SwiftBot Simon!");
+		System.out.println("A = Red, X = Blue, B = Yellow, Y = Green");
+		System.out.println("You have " + lives + " lives.");
 
 		try {
-			// Moves the wheels with the set left wheel and right wheel velocity, for 3
-			// seconds.
-			swiftBot.move(leftWheelVelocity, rightWheelVelocity, 3000);
-			testWheelReverse(wheel);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("ERROR: Error while testing wheel");
-			System.exit(5);
-		}
-	}
+			swiftBot.enableButton(Button.A, () -> presses.offer(0));
+			swiftBot.enableButton(Button.X, () -> presses.offer(1));
+			swiftBot.enableButton(Button.B, () -> presses.offer(2));
+			swiftBot.enableButton(Button.Y, () -> presses.offer(3));
 
-	/*
-	 * Tests the user-selected wheel defined in the method above, but reverses the
-	 * wheels instead. (Setting the velocity to -100 instead of 100)
-	 */
-	public static void testWheelReverse(String wheel) {
-		// These variables represent the % velocity of each wheel.
-		// They are updated later in the method, depending on the chosen wheel
-		int leftWheelVelocity = 0;
-		int rightWheelVelocity = 0;
+			while (lives > 0) {
 
-		// If left wheel is chosen, set left wheel velocity to 100
-		if (wheel.equals("left")) {
-			System.out.println("Testing the left wheel");
-			leftWheelVelocity = -100;
-		}
-		// Otherwise, set the right wheel velocity to 100.
-		else {
-			System.out.println("Testing the right wheel");
-			rightWheelVelocity = -100;
-		}
-
-		try {
-			// Moves the wheels with the set left wheel and right wheel velocity, for 3
-			// seconds.
-			swiftBot.move(leftWheelVelocity, rightWheelVelocity, 3000);
-			System.out.println("SUCCESS: wheel tests successful");
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("ERROR: Error while testing wheel");
-			System.exit(5);
-		}
-
-	}
-
-	/*
-	 * Tests each button by making them all active for 10 seconds. You can extend,
-	 * or shorten the time by changing the {@code endTime} variable. When you enable
-	 * a button, you are free to encase a method inside of it that will only run
-	 * once a button has been pressed. In this example, once a button has been
-	 * pressed, it'll be disabled using {@code swiftBot.disableButton();}, meaning
-	 * it cannot be pressed again. You are also able to disable all buttons by
-	 * running {@code swiftBot.disableAllButtons();}
-	 */
-	public static void testButtons() throws InterruptedException {
-		System.out.println(
-				"All buttons on your Bot will be active for the next 10 seconds.. \n Press each one separately");
-
-		try {
-			long endtime = System.currentTimeMillis() + 10_000;
-			swiftBot.enableButton(Button.A, () -> {
-				System.out.println("Button A Pressed.");
-				swiftBot.disableButton(Button.A);
-			});
-
-			swiftBot.enableButton(Button.B, () -> {
-				System.out.println("Button B Pressed.");
-				swiftBot.disableButton(Button.B);
-			});
-
-			swiftBot.enableButton(Button.X, () -> {
-				System.out.println("Button X Pressed.");
-				swiftBot.disableButton(Button.X);
-			});
-
-			swiftBot.enableButton(Button.Y, () -> {
-				System.out.println("Button Y Pressed.");
-				swiftBot.disableButton(Button.Y);
-			});
-
-			while (System.currentTimeMillis() < endtime) {
-				; // This while loop does nothing for 10 seconds.
-			}
-			swiftBot.disableAllButtons(); // Turns off all buttons now that it's been 10 seconds.
-			System.out.println("All buttons are now off.");
-
-		} catch (Exception e) {
-			System.out.println("ERROR occurred when setting up buttons.");
-			e.printStackTrace();
-			System.exit(5);
-		}
-
-	}
-
-	/*
-	 * This method uses a range of colours to test all under lights, where each
-	 * colour is represented as an integer array, with the first value being the
-	 * amount of red, the second the amount of green and the third the amount of
-	 * blue. These colours are then looped through with a for loop and assigned to
-	 * all under lights using the {@code fillUnderlights();} method.
-	 */
-	public static void testAllUnderlights() throws InterruptedException {
-		int[][] colours = { { 255, 0, 0 }, // Red
-				{ 0, 255, 0 }, // Green
-				{ 0, 0, 255 }, // Blue
-				{ 255, 255, 255 } // White
-		};
-
-		try {
-			// This for loop iterates through all colours in the colours array.
-			for (int[] rgb : colours) {
-				swiftBot.fillUnderlights(rgb);
-				Thread.sleep(300);
-			}
-			swiftBot.disableUnderlights();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("ERROR: failed to set all under lights");
-			System.exit(5);
-		}
-
-	}
-
-	/*
-	 * This method uses three colours to test each individual under light: red,
-	 * green and blue. An array of under lights are created, and then iterated
-	 * through with a for loop. Inside this for loop, each under light is set to
-	 * red, then 200 milliseconds later set to blue, then 200 milliseconds to green.
-	 * After this, the colour of the under light is not removed, such that when the
-	 * method finishes, all under lights should be green.
-	 */
-	public static void testIndividualUnderlights() throws InterruptedException {
-		// Declaring three variables containing the RGB values for red, green and blue.
-		int[] red = new int[] { 255, 0, 0 };
-		int[] blue = new int[] { 0, 0, 255 };
-		int[] green = new int[] { 0, 255, 0 };
-
-		try {
-			// Declaring an array of under lights.
-			Underlight[] underlights = new Underlight[] { Underlight.BACK_LEFT, Underlight.BACK_RIGHT,
-					Underlight.MIDDLE_LEFT, Underlight.MIDDLE_RIGHT, Underlight.FRONT_LEFT, Underlight.FRONT_RIGHT };
-
-			for (Underlight underlight : underlights) { // Iterates through the array of under lights
-				System.out.println("Testing: " + underlight);
-
-				swiftBot.setUnderlight(underlight, red);
-				Thread.sleep(200);
-
-				swiftBot.setUnderlight(underlight, green);
-				Thread.sleep(200);
-
-				swiftBot.setUnderlight(underlight, blue);
-				Thread.sleep(200);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("ERROR: Unable to set under light");
-			System.exit(5);
-		}
-
-		System.out.println("SUCCESS: All under lights should be blue");
-		Thread.sleep(2000);
-		swiftBot.disableUnderlights();
-	}
-
-	/*
-	 * This method takes a capture from the SwiftBot's camera to try and find a QR
-	 * code in an image, and then decode it. If a QR code is found, the method will
-	 * print the decoded message to the console. You could use these methods to have
-	 * the SwiftBot take commands such as movement, lights, etc by scanning them!
-	 * 
-	 * Note - the distance between the SwiftBot's camera and the QR code matters. If
-	 * the QR code is too close or too far, the camera's focus might not be able to
-	 * pick it up.
-	 */
-	public static void testQRCodeDetection() {
-
-		int attempts = 0;
-
-		while (attempts <= 10) {
-
-			System.out.println("Scanning for QR code...");
-
-			try {
-
-				BufferedImage img = swiftBot.getQRImage();
-				String decodedMessage = swiftBot.decodeQRImage(img);
-
-				if (!decodedMessage.isEmpty()) {
-					System.out.println("SUCCESS: QR code found");
-					System.out.println("Decoded message: " + decodedMessage);
-					break;
+				if (addNewColour) {
+					int nextColour = random.nextInt(4);
+					sequence = sequence + nextColour;
 				}
 
-				++attempts;
+				System.out.println("Watch the lights! Round " + sequence.length());
+				presses.clear();
+				Thread.sleep(1000);
 
-			} catch (Exception e) {
-				System.out.println("Unable to find QR code...trying again...");
-				++attempts;
+				for (int i = 0; i < sequence.length(); i++) {
+					int colour = sequence.charAt(i) - '0';
+					flashColour(colour);
+				}
+
+				System.out.println("Now press the buttons in the same order.");
+				presses.clear();
+				boolean correct = true;
+				
+				if ((round % 5 == 0) && (round != 0)) {
+					showContinue_QuitScreen();
+				}
+				else {
+
+					for (int i = 0; i < sequence.length(); i++) {
+						int expected = sequence.charAt(i) - '0';
+						int actual = presses.take();
+	
+						if (actual != expected) {
+							correct = false;
+							break;
+						}
+					}
+	
+					if (correct) {
+						System.out.println("Correct! Next round.");
+						addNewColour = true;
+						round += 1;
+						score += 1;
+					} else {
+						lives--;
+						System.out.println("Wrong! Lives left: " + lives);
+	
+						if (lives > 0) {
+							System.out.println("Try the same sequence again.");
+							addNewColour = false;
+						}
+					}
+				}
+				
+				Thread.sleep(600);
 			}
+
+			GameOver();
+
+		} finally {
+			swiftBot.disableUnderlights();
+			swiftBot.disableAllButtons();
 		}
 	}
+
+	static void flashColour(int colour) throws InterruptedException {
+
+		int[] rgb;
+
+		if (colour == 0) {
+			rgb = new int[] { 255, 0, 0 };
+		} else if (colour == 1) {
+			rgb = new int[] { 0, 0, 255 };
+		} else if (colour == 2) {
+			rgb = new int[] { 255, 255, 0 };
+		} else {
+			rgb = new int[] { 0, 255, 0 };
+		}
+
+		swiftBot.fillUnderlights(rgb);
+		Thread.sleep(700);
+		swiftBot.disableUnderlights();
+		Thread.sleep(350);
+	}
+	
+	public static void GameOver() {
+        System.out.println("===============================");
+        System.out.println("           GAME OVER!          ");
+        System.out.println("===============================");
+        System.out.println("");
+        System.out.println("You lost at round: " + round);
+        System.out.println("Current Score: " + score);
+        System.out.println("");
+        System.out.println("===============================");
+    }
+
 }
