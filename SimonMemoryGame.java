@@ -33,64 +33,7 @@ public class DoesMySwiftBotWork {
 		}
 
 		// --- HEADER (printed once) ---
-		System.out.printf("""
-
-				%1$s%2$s***************************************************************%3$s
-				%1$s%2$s*                     SWIFTBOT TEST MENU                      *%3$s
-				%1$s%2$s***************************************************************%3$s
-
-				""", CYAN, BOLD, RESET);
-		Scanner reader = new Scanner(System.in); // Reading from System.in
-
-		// loops main menu after each user action
-		while (true) {
-			// --- MENU ---
-			System.out.printf(
-					"%sSelect a feature to test:%s\n\n"
-							+ "%s [1] %sTest Camera          %s|%s  [2] %sTest Button Lights\n"
-							+ "%s [3] %sTest Ultrasound      %s|%s  [4] %sTest Left Wheel\n"
-							+ "%s [5] %sTest Right Wheel     %s|%s  [6] %sTest Buttons\n"
-							+ "%s [7] %sTest Underlighting   %s|%s  [8] %sTest QR Code Detection\n"
-							+ "%s---------------------------------------------------------------%s\n\n"
-							+ "%s [0] %sExit%s\n\n" + "%sEnter a number: %s",
-					WHITE, RESET, YELLOW, GREEN, WHITE, YELLOW, GREEN, YELLOW, GREEN, WHITE, YELLOW, GREEN, YELLOW,
-					GREEN, WHITE, YELLOW, GREEN, YELLOW, GREEN, WHITE, YELLOW, GREEN, CYAN, RESET, YELLOW, GREEN, RESET,
-					WHITE, RESET);
-
-			// reads user input and performs corresponding action
-			String ans = reader.next();
-
-			switch (ans) {
-
-			// Testing Camera
-			case "1":
-				StartUp();
-				break;
-				
-			// Testing Left Wheel
-			case "4":
-				showContinue_QuitScreen();
-				break;
-			// Testing Right Wheel
-
-			case "8":
-				LoopsForRound();
-				break;
-
-			// EXIT
-			case "0":
-				reader.close();
-				System.exit(0);
-				break;
-
-			default:
-				System.out.println("ERROR: Please enter a valid number.");
-				break;
-			}
-		}
-	}
-
-	public static void StartUp() {
+		
 		System.out.println("===============================");
 		System.out.println("       SIMON MEMORY GAME!      ");
 		System.out.println("===============================");
@@ -98,10 +41,17 @@ public class DoesMySwiftBotWork {
 		System.out.println("RULES OF THE GAME: ");
 		System.out.println("");
 		System.out.println("1) Repeat the order identically to the colours on the bot");
-		System.out.println("2) You only get 5 lives before GAME OVER");
+		System.out.println("2) You only get  lives before GAME OVER");
 		System.out.println("3) You will get the choice to continue or leave the game");
 		System.out.println("");
 		System.out.println("===============================");
+		
+		try {
+			LoopsForRound();
+		}
+		catch (Exception e) {
+			
+		}
 
 	}
 
@@ -109,16 +59,6 @@ public class DoesMySwiftBotWork {
 	// 0 =red, 1 =blue, 2 =yellow, 3 =green
 
 	static int[] button_Assignments = { 0, 1, 2, 3 };
-
-	public static boolean ShowScreen(int round) {
-		if (round % 5 == 0) {
-			showContinue_QuitScreen();
-			return true;
-		}
-
-		return false;
-
-	}
 
 	public static void showContinue_QuitScreen() {
 		
@@ -209,14 +149,16 @@ public class DoesMySwiftBotWork {
 					}
 	
 					if (correct) {
+						System.out.println("Correct! Next round.");
+						addNewColour = true;
+						round += 1;
+						score += 1;
+						
 						if ((round % 5 == 0) && (round != 0)) {
 							showContinue_QuitScreen();
 						}
 						else {
-							System.out.println("Correct! Next round.");
-							addNewColour = true;
-							round += 1;
-							score += 1;
+								
 						}
 					} else {
 						lives--;
