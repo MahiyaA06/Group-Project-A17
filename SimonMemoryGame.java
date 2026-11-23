@@ -121,6 +121,8 @@ public class DoesMySwiftBotWork {
 	}
 
 	public static void showContinue_QuitScreen() {
+		
+		Scanner reader = new Scanner(System.in);
 
 		System.out.println("===============================");
 		System.out.println("    CONTINUE OR QUIT GAME ?    ");
@@ -133,22 +135,28 @@ public class DoesMySwiftBotWork {
 		
 		String ans = reader.nextLine();
 		
-		switch (ans) {
-	
-		case "8":
-			LoopsForRound();
-			break;
-	
-		case "0":
-			GameOver();
-			System.exit(0);
-			break;
-	
-		default:
-			System.out.println("ERROR: Please enter a valid number.");
-			break;
+		try {
+			switch (ans) {
+			
+			case "1":
+				LoopsForRound();
+				break;
+		
+			case "2":
+				GameOver();
+				System.exit(0);
+				break;
+		
+			default:
+				System.out.println("ERROR: Please enter a valid number.");
+				break;
+			}
+		}
+		catch (Exception e) {
+			
 		}
 	}
+	
 
 	static Random random = new Random();
 	static BlockingQueue<Integer> presses = new LinkedBlockingQueue<>();
@@ -189,11 +197,6 @@ public class DoesMySwiftBotWork {
 				System.out.println("Now press the buttons in the same order.");
 				presses.clear();
 				boolean correct = true;
-				
-				if ((round % 5 == 0) && (round != 0)) {
-					showContinue_QuitScreen();
-				}
-				else {
 
 					for (int i = 0; i < sequence.length(); i++) {
 						int expected = sequence.charAt(i) - '0';
@@ -206,10 +209,15 @@ public class DoesMySwiftBotWork {
 					}
 	
 					if (correct) {
-						System.out.println("Correct! Next round.");
-						addNewColour = true;
-						round += 1;
-						score += 1;
+						if ((round % 5 == 0) && (round != 0)) {
+							showContinue_QuitScreen();
+						}
+						else {
+							System.out.println("Correct! Next round.");
+							addNewColour = true;
+							round += 1;
+							score += 1;
+						}
 					} else {
 						lives--;
 						System.out.println("Wrong! Lives left: " + lives);
@@ -218,7 +226,6 @@ public class DoesMySwiftBotWork {
 							System.out.println("Try the same sequence again.");
 							addNewColour = false;
 						}
-					}
 				}
 				
 				Thread.sleep(600);
